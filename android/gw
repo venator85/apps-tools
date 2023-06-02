@@ -1,0 +1,31 @@
+#!/bin/bash
+
+gw_exec=$(find /opt/homebrew/Cellar/gng -type f -name gng 2>/dev/null)
+if [ -z "$gw_exec" ]
+then
+  gw_exec=$(find /usr/local/Cellar/gng -type f -name gng 2>/dev/null)
+  if [ -z "$gw_exec" ]
+  then
+    echo "!! gw not found"
+    echo "!! install via homebrew:"
+    echo "   brew tap gdubw/gng && brew install gng"
+    exit 1
+  fi
+fi
+
+if [ -f ".jvmversion" ]; then
+  jvm_version=$(cat .jvmversion)
+
+  if [ "$jvm_version" = "8" ]; then
+    jvm_version="1.8"
+  fi
+
+  echo "Using specified JVM version $jvm_version"
+
+  JAVA_HOME=$(/usr/libexec/java_home -v"$jvm_version")
+  export JAVA_HOME
+else
+  echo "Using default JVM version"
+fi
+
+$gw_exec "$@"
